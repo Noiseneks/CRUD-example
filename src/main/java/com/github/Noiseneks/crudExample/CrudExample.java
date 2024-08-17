@@ -43,7 +43,7 @@ public class CrudExample {
                     try {
 
                         long id = Long.parseLong(scanner.nextLine());
-                        ShoppingListItem shoppingListItem = shoppingList.getPositionById(id);
+                        ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
                         if (shoppingListItem == null) {
                             System.out.println("Can't find item with given ID");
@@ -61,7 +61,7 @@ public class CrudExample {
                     System.out.println("Enter item ID: ");
                     try {
                         long id = Long.parseLong(scanner.nextLine());
-                        ShoppingListItem shoppingListItem = shoppingList.getPositionById(id);
+                        ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
                         if (shoppingListItem == null) {
                             System.out.println("Can't find item with given ID");
@@ -80,7 +80,7 @@ public class CrudExample {
                                 .setName(StringUtils.isEmpty(newName) ? shoppingListItem.getName() : newName)
                                 .setDescription(StringUtils.isEmpty(newDescription) ? shoppingListItem.getDescription() : newDescription);
 
-                        shoppingList.updatePosition(shoppingListItem);
+                        shoppingList.updateItem(shoppingListItem);
 
                         System.out.println("Item updated");
                     } catch (NumberFormatException numberFormatException) {
@@ -92,14 +92,14 @@ public class CrudExample {
                     System.out.println("Enter item ID: ");
                     try {
                         long id = Long.parseLong(scanner.nextLine());
-                        ShoppingListItem shoppingListItem = shoppingList.getPositionById(id);
+                        ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
                         if (shoppingListItem == null) {
                             System.out.println("Can't find item with given ID");
                             return;
                         }
 
-                        shoppingList.deletePositionById(id);
+                        shoppingList.deleteItemById(id);
 
                         System.out.println("Item deleted");
                     } catch (NumberFormatException numberFormatException) {

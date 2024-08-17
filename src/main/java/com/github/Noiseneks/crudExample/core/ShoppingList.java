@@ -10,18 +10,29 @@ import java.util.StringJoiner;
 public class ShoppingList {
 
     private final ArrayList<ShoppingListItem> itemsList = new ArrayList<>();
-    private long currentId = 1;
+
+    private long currentId = 1; // user-friendly counter starting from 1
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShoppingList.class);
 
+    /**
+     * This method adds provided item to shopping list
+     *
+     * @param shoppingListItem — provided item
+     */
     public void addPosition(ShoppingListItem shoppingListItem) {
         shoppingListItem.setId(currentId++);
         itemsList.add(shoppingListItem);
         LOGGER.info("Added item {} to shopping list", shoppingListItem);
     }
 
+
+    /**
+     * @param id — id of a item you want to get
+     * @return item with given id
+     */
     @Nullable
-    public ShoppingListItem getPositionById(long id) {
+    public ShoppingListItem getItemById(long id) {
 
         ShoppingListItem item = itemsList.stream()
                 .filter(x -> x.getId().equals(id))
@@ -35,10 +46,15 @@ public class ShoppingList {
         return item;
     }
 
-    public void updatePosition(ShoppingListItem shoppingListItem) {
+    /**
+     * Update existing item in list
+     *
+     * @param shoppingListItem — item with parameters you want to update
+     */
+    public void updateItem(ShoppingListItem shoppingListItem) {
 
         long id = shoppingListItem.getId();
-        ShoppingListItem existingListPosition = getPositionById(id);
+        ShoppingListItem existingListPosition = getItemById(id);
 
         if (existingListPosition == null) {
             return;
@@ -50,9 +66,14 @@ public class ShoppingList {
         LOGGER.info("Updated item in shopping list: {}", shoppingListItem);
     }
 
-    public void deletePositionById(long id) {
+    /**
+     * Deletes item from shopping list
+     *
+     * @param id — id of item you want to delete
+     */
+    public void deleteItemById(long id) {
 
-        ShoppingListItem shoppingListItem = getPositionById(id);
+        ShoppingListItem shoppingListItem = getItemById(id);
 
         if (shoppingListItem == null) {
             return;
@@ -63,6 +84,9 @@ public class ShoppingList {
         LOGGER.info("Removed list entity: {}", shoppingListItem);
     }
 
+    /**
+     * Returns pretty String view of shopping list item
+     */
     public String getPrettyStringView() {
         StringJoiner stringJoiner = new StringJoiner("\n");
         itemsList.forEach(item -> {

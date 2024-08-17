@@ -10,14 +10,13 @@ public class CrudTest {
 
     @Test
     public void testCreate() {
-
         ShoppingList shoppingList = new ShoppingList();
 
         shoppingList.addPosition(new ShoppingListItem()
                 .setName("Milk")
                 .setDescription("1 liter, 3.2%"));
 
-        ShoppingListItem item = shoppingList.getPositionById(1);
+        ShoppingListItem item = shoppingList.getItemById(1);
 
         assertNotNull(item);
     }
@@ -37,16 +36,16 @@ public class CrudTest {
         shoppingList.addPosition(new ShoppingListItem()
                 .setName("Water"));
 
-        ShoppingListItem item1 = shoppingList.getPositionById(1);
+        ShoppingListItem item1 = shoppingList.getItemById(1);
         assertNotNull(item1);
 
-        ShoppingListItem item2 = shoppingList.getPositionById(2);
+        ShoppingListItem item2 = shoppingList.getItemById(2);
         assertNotNull(item2);
 
-        ShoppingListItem item3 = shoppingList.getPositionById(3);
+        ShoppingListItem item3 = shoppingList.getItemById(3);
         assertNotNull(item3);
 
-        ShoppingListItem item4 = shoppingList.getPositionById(4);
+        ShoppingListItem item4 = shoppingList.getItemById(4);
         assertNull(item4);
     }
 
@@ -59,16 +58,16 @@ public class CrudTest {
         shoppingList.addPosition(new ShoppingListItem()
                 .setName("Water"));
 
-        ShoppingListItem item = shoppingList.getPositionById(1);
+        ShoppingListItem item = shoppingList.getItemById(1);
 
         assertNotNull(item);
         assertNotEquals(testDescription, item.getDescription());
 
         item.setDescription(testDescription);
-        shoppingList.updatePosition(item);
+        shoppingList.updateItem(item);
 
 
-        ShoppingListItem newItem = shoppingList.getPositionById(1);
+        ShoppingListItem newItem = shoppingList.getItemById(1);
 
         assertNotNull(newItem);
         assertEquals(testDescription, newItem.getDescription());
@@ -82,11 +81,11 @@ public class CrudTest {
                 .setName("Tea")
                 .setDescription("Green"));
 
-        ShoppingListItem item = shoppingList.getPositionById(1);
+        ShoppingListItem item = shoppingList.getItemById(1);
         assertNotNull(item);
 
-        shoppingList.deletePositionById(1);
-        ShoppingListItem newItem = shoppingList.getPositionById(1);
+        shoppingList.deleteItemById(1);
+        ShoppingListItem newItem = shoppingList.getItemById(1);
         assertNull(newItem);
     }
 
