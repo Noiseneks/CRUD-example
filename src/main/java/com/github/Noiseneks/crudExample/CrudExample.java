@@ -4,6 +4,7 @@ import com.github.Noiseneks.crudExample.core.ShoppingList;
 import com.github.Noiseneks.crudExample.core.ShoppingListItem;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
 import java.util.Scanner;
 
 public class CrudExample {
@@ -15,6 +16,7 @@ public class CrudExample {
         String command = "";
 
         while (!command.equalsIgnoreCase("exit")) {
+
             System.out.println("Your current shopping list:\n" + shoppingList.getPrettyStringView());
             System.out.println("Commands:");
             System.out.println("add - add item to list");
@@ -22,27 +24,31 @@ public class CrudExample {
             System.out.println("edit - modify a item from the list");
             System.out.println("delete - delete a item from the list ");
             System.out.println("Enter the command: ");
+
             command = scanner.nextLine();
 
             switch (command.toLowerCase()) {
                 case "add" -> {
                     System.out.println("Enter the item name:");
                     String name = scanner.nextLine();
+
                     if (StringUtils.isEmpty(name)) {
                         System.out.println("Item name can't be empty");
                         return;
                     }
+
                     System.out.println("Enter description (optional): ");
+
                     String description = scanner.nextLine();
+
                     shoppingList.addPosition(new ShoppingListItem()
                             .setName(name)
                             .setDescription(description));
                 }
                 case "get" -> {
                     System.out.println("Enter item ID: ");
-                    try {
 
-                        long id = Long.parseLong(scanner.nextLine());
+                    parseLongOptional(scanner.nextLine()).ifPresent(id -> {
                         ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
                         if (shoppingListItem == null) {
@@ -52,15 +58,12 @@ public class CrudExample {
 
                         System.out.println(shoppingListItem.toPrettyString());
 
-                    } catch (NumberFormatException numberFormatException) {
-                        System.out.println("Not a number");
-                        return;
-                    }
+                    });
                 }
                 case "edit" -> {
                     System.out.println("Enter item ID: ");
-                    try {
-                        long id = Long.parseLong(scanner.nextLine());
+
+                    parseLongOptional(scanner.nextLine()).ifPresent(id -> {
                         ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
                         if (shoppingListItem == null) {
@@ -83,34 +86,36 @@ public class CrudExample {
                         shoppingList.updateItem(shoppingListItem);
 
                         System.out.println("Item updated");
-                    } catch (NumberFormatException numberFormatException) {
-                        System.out.println("Not a number");
-                        return;
-                    }
+                    });
                 }
                 case "delete" -> {
                     System.out.println("Enter item ID: ");
-                    try {
-                        long id = Long.parseLong(scanner.nextLine());
-                        ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
-                        if (shoppingListItem == null) {
-                            System.out.println("Can't find item with given ID");
-                            return;
-                        }
+                    parseLongOptional(scanner.nextLine()).ifPresent(id -> {
+                                ShoppingListItem shoppingListItem = shoppingList.getItemById(id);
 
-                        shoppingList.deleteItemById(id);
+                                if (shoppingListItem == null) {
+                                    System.out.println("Can't find item with given ID");
+                                    return;
+                                }
 
-                        System.out.println("Item deleted");
-                    } catch (NumberFormatException numberFormatException) {
-                        System.out.println("Not a number");
-                        return;
-                    }
+                                shoppingList.deleteItemById(id);
+
+                                System.out.println("Item deleted");
+                            }
+                    );
                 }
                 default -> System.out.println("Unknown command");
             }
         }
-
     }
 
+    private static Optional<Long> parseLongOptional(String line) {
+        try {
+            return Optional.of(Long.parseLong(line));
+        } catch (NumberFormatException e) {
+            System.out.println("Not a number");
+            return Optional.empty();
+        }
+    }
 }
