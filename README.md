@@ -27,4 +27,4 @@ You can access the application's functionality using Postman. Default address is
 
 The application has some simple tests written, and the repository has Github Actions configured to run them
 and provide details about their results.
-![img_1.png](images/img_1.png)
+![img.png](images/img.png)
