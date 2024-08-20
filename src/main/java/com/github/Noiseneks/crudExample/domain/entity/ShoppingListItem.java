@@ -1,8 +1,18 @@
-package com.github.Noiseneks.crudExample.core;
+package com.github.Noiseneks.crudExample.domain.entity;
 
-import org.apache.commons.lang3.StringUtils;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "shopping_list_items")
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShoppingListItem {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
 
     private String name;
@@ -34,22 +44,5 @@ public class ShoppingListItem {
     public ShoppingListItem setDescription(String description) {
         this.description = description;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return "ShoppingListItem{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                '}';
-    }
-
-    public String toPrettyString() {
-        String result = this.getId() + ". " + this.getName();
-        if (StringUtils.isNotEmpty(result)) {
-            result += "\n " + this.getDescription();
-        }
-        return result;
     }
 }

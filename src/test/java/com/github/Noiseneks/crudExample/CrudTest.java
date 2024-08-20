@@ -1,92 +1,170 @@
 package com.github.Noiseneks.crudExample;
 
-import com.github.Noiseneks.crudExample.core.ShoppingList;
-import com.github.Noiseneks.crudExample.core.ShoppingListItem;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.Noiseneks.crudExample.domain.dtos.FullListResponse;
+import com.github.Noiseneks.crudExample.domain.dtos.IdDto;
+import com.github.Noiseneks.crudExample.domain.dtos.ItemCreateRequestDto;
+import com.github.Noiseneks.crudExample.domain.entity.ShoppingListItem;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class CrudTest {
 
+    @Autowired
+    private MockMvc mvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-    public void testCreate() {
-        ShoppingList shoppingList = new ShoppingList();
+    @Order(0)
+    public void testCreate() throws Exception {
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Milk")
-                .setDescription("1 liter, 3.2%"));
+        List<ItemCreateRequestDto> itemsToCreate = List.of(
+                new ItemCreateRequestDto()
+                        .setName("Milk")
+                        .setDescription("1 liter, 3.2%"),
+                new ItemCreateRequestDto()
+                        .setName("Tea")
+                        .setDescription("Green"),
+                new ItemCreateRequestDto()
+                        .setName("Water")
+        );
 
-        ShoppingListItem item = shoppingList.getItemById(1);
+        for (ItemCreateRequestDto itemCreateRequestDto : itemsToCreate) {
+            RequestBuilder requestBuilder = MockMvcRequestBuilders
+                    .post("/create")
+                    .content(objectMapper.writeValueAsString(itemCreateRequestDto))
+                    .contentType(MediaType.APPLICATION_JSON);
 
-        assertNotNull(item);
+            MvcResult mvcResult = mvc.perform(requestBuilder).andReturn();
+            MockHttpServletResponse response = mvcResult.getResponse();
+
+            assertEquals(HttpStatus.OK.value(), response.getStatus());
+        }
     }
 
     @Test
-    public void testRead() {
-        ShoppingList shoppingList = new ShoppingList();
+    @Order(1)
+    public void testRead() throws Exception {
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Milk")
-                .setDescription("1 liter, 3.2%"));
+        IdDto idDto = new IdDto().setId(1L);
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Tea")
-                .setDescription("Green"));
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/getById")
+                .content(objectMapper.writeValueAsString(idDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Water"));
+        MvcResult mvcResult = mvc.perform(requestBuilder).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
 
-        ShoppingListItem item1 = shoppingList.getItemById(1);
-        assertNotNull(item1);
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
 
-        ShoppingListItem item2 = shoppingList.getItemById(2);
-        assertNotNull(item2);
+        IdDto idDto2 = new IdDto().setId(4L);
 
-        ShoppingListItem item3 = shoppingList.getItemById(3);
-        assertNotNull(item3);
+        RequestBuilder requestBuilder2 = MockMvcRequestBuilders
+                .get("/getById")
+                .content(objectMapper.writeValueAsString(idDto2))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
 
-        ShoppingListItem item4 = shoppingList.getItemById(4);
-        assertNull(item4);
+        MvcResult mvcResult2 = mvc.perform(requestBuilder2).andReturn();
+        MockHttpServletResponse response2 = mvcResult2.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), response2.getStatus());
     }
 
     @Test
-    public void testUpdate() {
-        ShoppingList shoppingList = new ShoppingList();
+    @Order(2)
+    public void testUpdate() throws Exception {
 
         String testDescription = "2 liters";
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Water"));
+        ShoppingListItem shoppingListItem = new ShoppingListItem()
+                .setId(1L)
+                .setDescription(testDescription);
 
-        ShoppingListItem item = shoppingList.getItemById(1);
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .patch("/update")
+                .content(objectMapper.writeValueAsString(shoppingListItem))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
 
-        assertNotNull(item);
-        assertNotEquals(testDescription, item.getDescription());
+        MvcResult mvcResult = mvc.perform(requestBuilder).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
 
-        item.setDescription(testDescription);
-        shoppingList.updateItem(item);
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
 
+        ShoppingListItem shoppingListItemResponse = objectMapper.readValue(response.getContentAsString(), ShoppingListItem.class);
 
-        ShoppingListItem newItem = shoppingList.getItemById(1);
-
-        assertNotNull(newItem);
-        assertEquals(testDescription, newItem.getDescription());
+        assertEquals(testDescription, shoppingListItemResponse.getDescription());
     }
 
     @Test
-    public void testDelete() {
-        ShoppingList shoppingList = new ShoppingList();
+    @Order(3)
+    public void testDelete() throws Exception {
+        IdDto idDto = new IdDto().setId(1L);
 
-        shoppingList.addPosition(new ShoppingListItem()
-                .setName("Tea")
-                .setDescription("Green"));
+        RequestBuilder deleteRequestBuilder = MockMvcRequestBuilders
+                .delete("/deleteById")
+                .content(objectMapper.writeValueAsString(idDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
 
-        ShoppingListItem item = shoppingList.getItemById(1);
-        assertNotNull(item);
+        MvcResult mvcDeleteResult = mvc.perform(deleteRequestBuilder).andReturn();
+        MockHttpServletResponse deleteResultResponse = mvcDeleteResult.getResponse();
 
-        shoppingList.deleteItemById(1);
-        ShoppingListItem newItem = shoppingList.getItemById(1);
-        assertNull(newItem);
+        assertEquals(HttpStatus.OK.value(), deleteResultResponse.getStatus());
+
+
+        RequestBuilder getRequestBuilder = MockMvcRequestBuilders
+                .get("/getById")
+                .content(objectMapper.writeValueAsString(idDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcGetResult = mvc.perform(getRequestBuilder).andReturn();
+        MockHttpServletResponse getResponse = mvcGetResult.getResponse();
+
+        assertEquals(HttpStatus.NOT_FOUND.value(), getResponse.getStatus());
     }
 
+    @Test
+    @Order(4)
+    public void testGetFulLList() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get("/getFullList")
+                .accept(MediaType.APPLICATION_JSON);
+
+        MvcResult mvcResult = mvc.perform(requestBuilder).andReturn();
+        MockHttpServletResponse response = mvcResult.getResponse();
+
+        assertEquals(HttpStatus.OK.value(), response.getStatus());
+
+        FullListResponse fullListResponse = objectMapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        });
+
+        assertEquals(2, fullListResponse.getItems().size());
+    }
 }
