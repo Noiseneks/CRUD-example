@@ -18,7 +18,7 @@ dependencies {
     implementation("org.jetbrains:annotations:24.1.0")
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-    implementation("org.apache.commons:commons-lang3:3.16.0")
+    implementation("org.apache.commons:commons-lang3:3.17.0")
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation("org.slf4j:slf4j-api:2.0.16")
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
